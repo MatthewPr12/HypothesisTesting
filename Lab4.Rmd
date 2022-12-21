@@ -1,5 +1,6 @@
 ---
 title: "R Notebook"
+authors: "Yaroslav Korch, Anastasiia Senyk, Matvii Prytula"
 output: html_notebook
 ---
 
@@ -8,7 +9,36 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
 ```{r}
-plot(cars)
+id = 21
+k = c(1:100)
+l = c(1:50)
+
+# func to generate a_k for x_k
+gen <- function(k){
+  return((k*log(k^2*id+pi))%%1)
+}
+```
+
+
+```{r}
+#generating data
+a_k = sapply(k, gen)
+a_l = sapply(l+100, gen)
+x_k = qnorm(a_k)
+y_l = qnorm(a_l)
+
+#plotting data
+my_plot <- function(data, title, breaks_num){
+  h <- hist(data, breaks=breaks_num, plot=FALSE)
+  cuts <- cut(h$breaks, c(-Inf,-.005,Inf))
+  plot(h, col=c("red", "black")[cuts], main=title)
+}
+
+my_plot(x_k, "x_k", 50)
+my_plot(y_l, "y_l", 25)
+```
+```{r}
+
 ```
 
 Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
