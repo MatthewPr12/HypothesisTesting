@@ -1,12 +1,29 @@
 ---
 title: "R Notebook"
-authors: "Yaroslav Korch, Anastasiia Senyk, Matvii Prytula"
-output: html_notebook
+authors: Yaroslav Korch, Anastasiia Senyk, Matvii Prytula
+output:
+  html_document:
+    df_print: paged
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code.
+# Hypothesis testing!
+## Team members:
+# Matvii Prytula, Anastasia Senyk, Yaroslav Korch
+...................................................................................................................................................................................................
+...................................................................................................................................................................................................
+...................................................................................................................................................................................................
+...................................................................................................................................................................................................
+...................................................................................................................................................................................................
 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*.
+```{r}
+
+require(BSDA)
+library(BSDA)
+require(EnvStats)
+library(EnvStats)
+
+```
+
 
 ```{r}
 id <- 21
@@ -27,6 +44,9 @@ a_l <- sapply(l + 100, gen)
 x_k <- qnorm(a_k)
 y_l <- qnorm(a_l)
 
+x <- x_k
+y <- y_l
+
 #plotting data
 my_plot <- function(data, title, breaks_num) {
   h <- hist(data, breaks = breaks_num, plot = FALSE)
@@ -37,13 +57,52 @@ my_plot <- function(data, title, breaks_num) {
 my_plot(x_k, "x_k", 50)
 my_plot(y_l, "y_l", 25)
 ```
-```{r}
 
+
+
+# Problem 1. $H_0 : μ_1 =μ_2 \ vs. \ H_1 :μ_1 \ne μ_2; \ σ_1 = σ_2 =1$
+```{r}
+z.test(x = x, y = y, alternative = "t", sigma.x = 1, sigma.y = 1)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+### We test whether **x_k** and **y_l** means are equal -- $H_0$, or not -- $H_1$. We can apply a z-test, since we are given the variance.
+The **alternative = "t"** means two-sided check. The p-value turns out to be $\approx$ 0.49: $p_{val} > \alpha$ which tells that we should not reject the null hypothesis.
+The difference of means lies in the $95%$ confidence interval, as expected.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
+# Problem 2. $H_0:σ_1=σ_2 vs. H_1:σ1_>σ_2; μ_1 \ and \ μ_2 \ are \ unknown$
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+var.test(x, y, alternative = "g")
+```
+We do not reject the null hypothesis as we can see that the ratio of variances is $\approx 0.85$, which is close to $1$, and $p_{val} > \alpha$.
+Also one can see that the ratio of variances lies in the confidence interval.
 
+
+# 3. Using Kolmogorov–Smirnov test in R
+
+### a) $\{x_k\}_{k=1}^{100}$ are normally distributed (with parameters calculated from the sample);
+```{r}
+ks.test(x, "pnorm")
+```
+
+$H_0$ -- data is drawn from a normal distribution. $H_1$ -- not from a normal one.
+The $p-value$ is large, so we can't reject the null hypothesis.
+
+### b) $\{|x_k|\}_{k=1}^{100}$ k=1 are exponentially distributed with λ = 1
+
+```{r}
+ks.test(abs(x), "exp")
+```
+$H_0$ -- data is drawn from a exponential distribution. $H_1$ -- not from an exponential one.
+The $p-value$ is super tiny, so we can confidently reject the null hypothesis.
+
+### c) $\{x_k\}_{k=1}^{100}$ and $\{y_l\}_{l=1}^{50}$ have the same distributions.
+```{r}
+ks.test(x, y)
+```
+$H_0$ -- x and y are drawn from the same distribution. $H_1$ -- from different distributions.
+We do not have enough evidence to reject the null hypothesis, since $p-value$ is relatively big.
+
+
+
+### Results: you never know :=)
